@@ -1,0 +1,17 @@
+{{<base}}
+{{$title}}{{title}} - {{site_name}}{{/title}}
+{{$body}}
+<h1>{{title}}</h1>
+<div style="display: flex; justify-content: space-between;">
+  <p style="margin: 0;">
+  {{#tags}}
+  <a href="/tag/{{id}}.html">#{{id}}</a>
+  {{/tags}}
+  </p>
+  <p style="margin: 0;">{{date}}</p>
+</div>
+<hr />
+
+{{& content}}
+{{/body}}
+{{/base}}

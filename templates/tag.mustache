@@ -1,0 +1,13 @@
+{{<base}}
+{{$title}}{{id}} - {{site_name}}{{/title}}
+{{$body}}
+<h1>{{id}}</h1>
+<ul>
+{{#posts}}
+<li>
+<a href="/post/{{slug}}.html">{{title}}</a>
+</li>
+{{/posts}}
+</ul>
+{{/body}}
+{{/base}}

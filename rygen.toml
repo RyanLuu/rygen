@@ -1,0 +1,8 @@
+name = "Rygen blog"
+
+pages = [ "index", "about", "blog" ]
+
+[post.example]
+title = "Example post"
+tags = [ "example", "markdown" ]
+date = 2023-01-01

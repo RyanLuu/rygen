@@ -1,0 +1,17 @@
+{{<base}}
+{{$body}}
+<h1>My blog</h1>
+<p>Posts:</p>
+<ul style="list-style-type: none;">
+  {{#posts}}
+  <li><small>{{date}}</small> &sdot; <a href="/post/{{slug}}.html">{{title}}</a></li>
+  {{/posts}}
+</ul>
+<p>Tags:</p>
+<ul style="list-style-type: none;">
+  {{#tags}}
+  <li><a href="/tag/{{id}}.html">#{{id}}</a></li>
+  {{/tags}}
+</ul>
+{{/body}}
+{{/base}}
