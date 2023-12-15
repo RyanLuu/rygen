@@ -46,11 +46,23 @@ int meta_post_date_cmp(const void *a, const void *b) {
 meta_t *meta_render(const toml_table_t *meta_toml) {
   meta_t *meta = malloc_panic(sizeof(meta_t));
 
-  toml_datum_t name_toml = toml_string_in(meta_toml, "name");
-  if (!name_toml.ok) {
+  toml_datum_t site_name_toml = toml_string_in(meta_toml, "site_name");
+  if (!site_name_toml.ok) {
     PANIC("Failed to get site name");
   }
-  meta->site_name = name_toml.u.s;
+  meta->site_name = site_name_toml.u.s;
+
+  toml_datum_t site_url_toml = toml_string_in(meta_toml, "site_url");
+  if (!site_url_toml.ok) {
+    PANIC("Failed to get site url");
+  }
+  meta->site_url = site_url_toml.u.s;
+
+  toml_datum_t site_desc_toml = toml_string_in(meta_toml, "site_desc");
+  if (!site_desc_toml.ok) {
+    PANIC("Failed to get site desc");
+  }
+  meta->site_desc = site_desc_toml.u.s;
 
   meta->version = malloc_panic(8);
   snprintf(meta->version, 8, "v%d.%d", SSG_VERSION_MAJOR, SSG_VERSION_MINOR);
@@ -90,6 +102,16 @@ meta_t *meta_render(const toml_table_t *meta_toml) {
       PANIC("Failed to get title for post %s", meta->posts[post_handle].slug);
     }
     meta->posts[post_handle].title = title_toml.u.s;
+
+    if (toml_key_exists(post_i_toml, "desc")) {
+      toml_datum_t desc_toml = toml_string_in(post_i_toml, "desc");
+      if (!desc_toml.ok) {
+        PANIC("Failed to get desc for post %s", meta->posts[post_handle].slug);
+      }
+      meta->posts[post_handle].desc = desc_toml.u.s;
+    } else {
+      meta->posts[post_handle].desc = NULL;
+    }
 
     toml_datum_t date_toml = toml_timestamp_in(post_i_toml, "date");
     if (!date_toml.ok) {
@@ -149,6 +171,9 @@ void meta_free(meta_t *meta) {
   for (int i = 0; i < meta->num_posts; ++i) {
     free(meta->posts[i].slug);
     free(meta->posts[i].title);
+    if (meta->posts[i].desc != NULL) {
+      free(meta->posts[i].desc);
+    }
     free(meta->posts[i].tag_handles);
     if (meta->posts[i].content != NULL) {
       free(meta->posts[i].content);
@@ -171,12 +196,16 @@ void meta_free(meta_t *meta) {
   free(meta->pages);
 
   free(meta->site_name);
+  free(meta->site_url);
+  free(meta->site_desc);
   free(meta->version);
   free(meta);
 }
 
 void meta_debug(const meta_t *meta) {
   printf("Name: %s\n", meta->site_name);
+  printf("URL: %s\n", meta->site_url);
+  printf("Description: %s\n", meta->site_desc);
   printf("Pages: [ ");
   for (uint32_t i = 0; i < meta->num_pages; ++i) {
     printf("%s ", meta->pages[i]);

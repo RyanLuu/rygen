@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+
+<channel>
+  <atom:link href="{{site_url}}/rss.xml" rel="self" type="application/rss+xml" />
+  <title>{{site_name}}</title>
+  <link>{{site_url}}</link>
+  <description>{{site_desc}}</description>
+  {{#posts}}
+  <item>
+    <title>{{title}}</title>
+    <link>{{site_url}}/post/{{slug}}.html</link>
+    <guid>{{site_url}}/post/{{slug}}.html</guid>
+    <description>{{desc}}</description>
+    {{#tags}}
+    <category>{{id}}</category>
+    {{/tags}}
+  </item>
+  {{/posts}}
+</channel>
+
+</rss> 

@@ -127,6 +127,8 @@ char *get_post(meta_post_t *post, const char *name) {
     return post->slug;
   } else if (strcmp(name, "title") == 0) {
     return post->title;
+  } else if (strcmp(name, "desc") == 0) {
+    return (post->desc != NULL) ? post->desc : empty_string();
   } else if (strcmp(name, "content") == 0) {
     post->content = render_post_content(post->slug);
     return post->content;
@@ -158,6 +160,10 @@ char *get_js(meta_post_t *post, const char *name) {
 char *get_root(meta_t *meta, const char *name) {
   if (strcmp(name, "site_name") == 0) {
     return meta->site_name;
+  } else if (strcmp(name, "site_url") == 0) {
+    return meta->site_url;
+  } else if (strcmp(name, "site_desc") == 0) {
+    return meta->site_desc;
   } else if (strcmp(name, "version") == 0) {
     return meta->version;
   }
@@ -226,8 +232,8 @@ FILE *open_output_file(char *slug, char *fext) {
   return fp;
 }
 
-void render_html(closure_t *closure, string_t tmpl, char *slug_out) {
-  FILE *fp_out = open_output_file(slug_out, "html");
+void render_file(closure_t *closure, string_t tmpl, char *slug_out, char *ext) {
+  FILE *fp_out = open_output_file(slug_out, ext);
 
   struct mustach_itf itf = {
       .start = NULL,

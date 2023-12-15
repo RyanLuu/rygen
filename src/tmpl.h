@@ -16,6 +16,6 @@ typedef struct {
 extern void make_output_dir(char *path);
 extern void copy_files(char *fromdir, char *todir);
 extern string_t read_template(const char *slug);
-extern void render_html(closure_t *closure, string_t tmpl, char *slug_out);
+extern void render_file(closure_t *closure, string_t tmpl, char *slug_out, char *ext);
 
 #endif

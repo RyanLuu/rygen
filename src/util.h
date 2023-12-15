@@ -26,5 +26,6 @@ typedef struct {
 
 extern void *malloc_panic(size_t size);
 extern string_t read_file(const char *filename);
+extern char *empty_string(void);
 
 #endif

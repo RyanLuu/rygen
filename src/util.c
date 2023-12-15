@@ -28,3 +28,7 @@ string_t read_file(const char *path) {
   fclose(fp);
   return string;
 }
+
+static char empty = '\0';
+
+char *empty_string(void) { return &empty; }

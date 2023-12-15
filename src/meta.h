@@ -9,6 +9,7 @@ typedef struct {
   char *slug;
   char *title;
   char date[11]; // YYYY-MM-DD\0
+  char *desc;
   char *content;
   uint32_t *tag_handles;
   uint32_t num_tags;
@@ -23,6 +24,8 @@ typedef struct {
 
 typedef struct {
   char *site_name;
+  char *site_url;
+  char *site_desc;
   char *version;
   meta_post_t *posts;
   uint32_t num_posts;

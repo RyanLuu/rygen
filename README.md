@@ -42,6 +42,6 @@ CSS styles and other static content can be found in `static/`. The color scheme 
 
 - Code highlighting with [tree-sitter](https://github.com/tree-sitter/tree-sitter)
 - Arbitrary data specified in `rygen.toml` and queryable in templates
-- RSS support
+- Write `publish` script that manages publish date and creates/updates pages
 - Better JS & WASM support
 
