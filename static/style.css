@@ -43,11 +43,6 @@ main blockquote {
   padding: 0 1em;
 }
 
-footer {
-  flex-shrink: 0;
-  font-size: 12px;
-}
-
 a {
   color: var(--accent);
   text-decoration: none;
@@ -57,12 +52,38 @@ a:hover {
   color: var(--base05);
 }
 
-.nav a {
+footer {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--base03);
+}
+
+
+#nav {
+  display: flex;
+  justify-content: space-between;
+}
+
+#nav a {
   padding: 0.5em;
 }
 
-.nav a:first-child {
+#nav a.home-link {
   background-color: var(--accent);
   color: var(--base00);
+}
+
+article header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+article header h1, hr {
+  width: 100%;
+}
+
+article header time {
+  color: var(--base03);
 }
 
