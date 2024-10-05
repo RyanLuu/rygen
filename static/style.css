@@ -24,23 +24,23 @@ body {
 
 main {
   flex: 1 0 auto;
-}
 
-main code {
-  background-color: var(--base01);
-  border-radius: 4px;
-  padding: 0 4px;
-}
+  code {
+    background-color: var(--base01);
+    border-radius: 4px;
+    padding: 0 4px;
+  }
 
-main pre {
-  background-color: var(--base01);
-  padding: 1em;
-}
+  pre {
+    background-color: var(--base01);
+    padding: 1em;
+  }
 
-main blockquote {
-  border-left: 2px solid var(--accent);
-  margin: 1em;
-  padding: 0 1em;
+  blockquote {
+    border-left: 2px solid var(--accent);
+    margin: 1em;
+    padding: 0 1em;
+  }
 }
 
 a {
@@ -50,6 +50,10 @@ a {
 
 a:hover {
   color: var(--base05);
+}
+
+hr {
+  color: var(--base03);
 }
 
 footer {
@@ -77,13 +81,42 @@ article header {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  align-items: center;
+
+  .line-break {
+    width: 100%;
+  }
+
+  hr {
+    flex-grow: 1;
+  }
+
+
+  time, .desc {
+    color: var(--base03);
+  }
 }
 
-article header h1, hr {
-  width: 100%;
-}
-
-article header time {
-  color: var(--base03);
+code {
+  .comment,
+  .line_comment {
+    color: var(--base03);
+  }
+  .string_literal {
+    color: var(--base0B);
+  }
+  .integer_literal,
+  .float_literal,
+  .number_literal {
+    color: var(--base09);
+  }
+  .primitive_type,
+  .type_identifier {
+    font-weight: bold;
+    color: var(--base0A);
+  }
+  .preproc_include {
+    color: var(--base0D);
+  }
 }
 

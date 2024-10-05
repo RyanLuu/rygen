@@ -6,9 +6,31 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <tree_sitter/api.h>
 #include <unistd.h>
 
+#include "hescape/hescape.h"
 #include "mustach/mustach.h"
+#include "util.h"
+
+#define TS_GRAMMARS                                                                                \
+  X(c)                                                                                             \
+  X(rust)
+
+#define X(grammar) TSLanguage *tree_sitter_##grammar(void);
+TS_GRAMMARS
+#undef X
+
+typedef struct {
+  char *name;
+  TSLanguage *(*tsl)(void);
+} Language;
+
+Language g_languages[] = {
+#define X(grammar) {#grammar, tree_sitter_##grammar},
+    TS_GRAMMARS
+#undef X
+};
 
 FILE *open_post_md(const char *slug) {
   char path[MAX_PATH_LEN];
@@ -20,11 +42,134 @@ FILE *open_post_md(const char *slug) {
   return fp;
 }
 
+static bool is_interesting_node(TSNode node) {
+  char *interesting_node_types[] = {
+      // commment
+      "line_comment",
+      "comment",
+      // string literal
+      "string_literal",
+      // numeric literal
+      "integer_literal",
+      "float_literal",
+      "number_literal",
+      // type
+      "primitive_type",
+      "type_identifier",
+      // preproc
+      "preproc_include",
+  };
+  for (size_t i = 0; i < arrlen(interesting_node_types); ++i) {
+    if (strcmp(ts_node_type(node), interesting_node_types[i]) == 0) {
+      return true;
+    }
+  }
+  return false;
+}
+
+static char *highlight_code_node(char *dest, const char *src, uint32_t *cursor, TSNode node) {
+  printf("%s\n", ts_node_type(node));
+  uint32_t child_count = ts_node_child_count(node);
+  if (child_count == 0) {
+    uint32_t start = ts_node_start_byte(node);
+    uint32_t end = ts_node_end_byte(node);
+    if (*cursor < start) {
+      char *esc_code = NULL;
+      int len = hesc_escape_html((uint8_t **)&esc_code, (uint8_t *)src + *cursor, start - *cursor);
+      dest += sprintf(dest, "%.*s", len, esc_code);
+    }
+    if (is_interesting_node(node)) {
+      dest += sprintf(dest, "<span class=\"%s\">%.*s</span>", ts_node_type(node), end - start,
+                      src + start);
+    } else {
+      char *esc_code = NULL;
+      int len = hesc_escape_html((uint8_t **)&esc_code, (uint8_t *)src + start, end - start);
+      dest += sprintf(dest, "%.*s", len, esc_code);
+    }
+    *cursor = end;
+  } else {
+    bool interesting = is_interesting_node(node);
+    if (interesting) {
+      dest += sprintf(dest, "<span class=\"%s\">", ts_node_type(node));
+    }
+    for (uint32_t i = 0; i < child_count; ++i) {
+      dest = highlight_code_node(dest, src, cursor, ts_node_child(node, i));
+    }
+    if (interesting) {
+      dest += sprintf(dest, "</span>");
+    }
+  }
+  return dest;
+}
+
+static char *highlight_code(char *dest, const char *src, uint32_t srclen, TSTree *tree) {
+  TSNode root_node = ts_tree_root_node(tree);
+  uint32_t cursor = 0;
+  dest = highlight_code_node(dest, src, &cursor, root_node);
+  if (cursor < srclen) {
+    dest += sprintf(dest, "%.*s", srclen - cursor, src + cursor);
+  }
+  return dest;
+}
+
 char *render_post_content(const char *slug) {
   FILE *post_md = open_post_md(slug);
   cmark_node *node = cmark_parse_file(post_md, CMARK_OPT_DEFAULT);
+
+  // DEBUG
+  {
+    cmark_iter *iter = cmark_iter_new(node);
+    cmark_event_type e;
+    do {
+      e = cmark_iter_next(iter);
+      switch (e) {
+      case CMARK_EVENT_NONE:
+        break;
+      case CMARK_EVENT_DONE:
+        break;
+      case CMARK_EVENT_ENTER:
+        if (cmark_node_get_type(cmark_iter_get_node(iter)) == CMARK_NODE_CODE_BLOCK) {
+          cmark_node *code_block_node = cmark_iter_get_node(iter);
+          const char *code = cmark_node_get_literal(code_block_node);
+
+          TSLanguage *language = NULL;
+          const char *fence_info = cmark_node_get_fence_info(code_block_node);
+          for (int i = 0; i < sizeof(g_languages) / sizeof(*g_languages); ++i) {
+            if (!strcmp(fence_info, g_languages[i].name)) {
+              language = g_languages[i].tsl();
+              break;
+            }
+          }
+          if (language == NULL) {
+            break;
+          }
+          TSParser *parser = ts_parser_new();
+          ts_parser_set_language(parser, language);
+          assert(ts_parser_language(parser) != NULL);
+          TSTree *tree = ts_parser_parse_string(parser, NULL, code, strlen(code));
+          ts_parser_delete(parser);
+
+          char code_buf[4096]; // TODO: dynamic buffer
+          char *code_start =
+              code_buf + sprintf(code_buf, "<pre><code class=\"language-%s\">", fence_info);
+          cmark_node *new_code_node = cmark_node_new(CMARK_NODE_HTML_BLOCK);
+          char *code_end = highlight_code(code_start, code, strlen(code), tree);
+          sprintf(code_end, "</code></pre>");
+          cmark_node_set_literal(new_code_node, code_buf);
+          assert(cmark_node_insert_after(code_block_node, new_code_node));
+          cmark_node_free(code_block_node); // automatically unlinks
+          ts_tree_delete(tree);
+        }
+        break;
+      case CMARK_EVENT_EXIT:
+        break;
+      }
+    } while (e != CMARK_EVENT_DONE);
+    cmark_iter_free(iter);
+  }
+
   fclose(post_md);
-  char *html = cmark_render_html(node, CMARK_OPT_DEFAULT);
+  char *html = cmark_render_html(node, CMARK_OPT_UNSAFE);
   cmark_node_free(node);
   return html;
 }
@@ -128,7 +273,7 @@ char *get_post(meta_post_t *post, const char *name) {
   } else if (strcmp(name, "title") == 0) {
     return post->title;
   } else if (strcmp(name, "desc") == 0) {
-    return (post->desc != NULL) ? post->desc : empty_string();
+    return (post->desc != NULL) ? post->desc : "";
   } else if (strcmp(name, "content") == 0) {
     post->content = render_post_content(post->slug);
     return post->content;
@@ -139,7 +284,9 @@ char *get_post(meta_post_t *post, const char *name) {
 }
 
 char *get_tag(meta_tag_t *tag, const char *name) {
+  printf("tag.'%s'\n", name);
   if (strcmp(name, "id") == 0) {
+    printf("tag id = %s\n", tag->id);
     return tag->id;
   }
   return NULL;

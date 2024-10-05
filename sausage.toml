@@ -1,4 +1,4 @@
-site_name = "Rygen blog"
+site_name = "Sausage blog"
 site_url = "https://example.com"
 site_desc = "Blog about interesting things"
 
@@ -8,4 +8,4 @@ pages = [ "index", "about", "blog" ]
 title = "Example post"
 tags = [ "example", "markdown" ]
 date = 2023-01-01
-desc = "Showcasing the features of Markdown"
+desc = "Description of the post"

@@ -10,6 +10,14 @@ This is an example post that demonstrates the features of Markdown, including **
 - unordered
 - lists,
 
-```
-and code blocks!
+```c
+// and code blocks!
+
+#include <stdio.h>
+int main() {
+    for (int i = 0; i < 10; ++i) {
+        printf("Hello world!");
+    }
+    return 0;
+}
 ```

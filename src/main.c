@@ -4,7 +4,6 @@
  * TODO: do a directory search for src files in flake.nix
  * TODO: test if wasm works in js
  * TODO: test a wasm memory interface
- * TODO: include tree-sitter https://github.com/tree-sitter/tree-sitter
  */
 
 #include <errno.h>
@@ -57,12 +56,12 @@ int main(int argc, char **argv) {
   };
 
   for (uint32_t i = 0; i < meta->num_pages; ++i) {
-    printf("  %s\n", meta->pages[i]);
+    printf("  " OUTPUT_DIR "/%s\n", meta->pages[i]);
     string_t tmpl = read_template(meta->pages[i]);
     render_file(&closure, tmpl, meta->pages[i], "html");
     free(tmpl.data);
   }
-  printf("  rss.xml\n");
+  printf("  " OUTPUT_DIR "/rss.xml\n");
   string_t tmpl = read_template("rss");
   render_file(&closure, tmpl, "rss", "xml");
   free(tmpl.data);
@@ -73,7 +72,7 @@ int main(int argc, char **argv) {
     closure.index = i;
     char slug[256];
     snprintf(slug, sizeof(slug), "post/%s", meta->posts[i].slug);
-    printf("  %s\n", slug);
+    printf("  " OUTPUT_DIR "/%s\n", slug);
     render_file(&closure, tmpl_post, slug, "html");
   }
   free(tmpl_post.data);
@@ -84,7 +83,7 @@ int main(int argc, char **argv) {
     closure.index = i;
     char slug[256];
     snprintf(slug, sizeof(slug), "tag/%s", meta->tags[i].id);
-    printf("  %s\n", slug);
+    printf("  " OUTPUT_DIR "/%s\n", slug);
     render_file(&closure, tmpl_tag, slug, "html");
   }
   free(tmpl_tag.data);

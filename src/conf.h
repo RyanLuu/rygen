@@ -5,7 +5,7 @@
 #define SSG_VERSION_MAJOR (SSG_VERSION / 100)
 #define SSG_VERSION_MINOR (SSG_VERSION % 100)
 
-#define METADATA_FILE "rygen.toml"
+#define METADATA_FILE "sausage.toml"
 #define STATIC_DIR "static"
 #define WASM_DIR "result/bin/wasm"
 #define OUTPUT_DIR "public"

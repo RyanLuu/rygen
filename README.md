@@ -1,20 +1,20 @@
-# rygen
+# sausage
 
-`rygen` is a static site generator.
+Sausage is a static site generator.
 
 ## Getting started
 
-First, build and run rygen:
+First, build and run Sausage:
 
 ```
 nix build
-result/bin/rygen
+result/bin/sausage
 ```
 
 Then, start an HTTP server:
 
 ```
-lighttpd -D -f lighttpd.conf 
+lighttpd -D -f lighttpd.conf
 # or
 cd public; python3 -m http.server
 ```
@@ -23,7 +23,7 @@ Finally, visit it at http://localhost:8000/.
 
 ## Adding content
 
-To add a post, simply write Markdown in `posts/foo.md`, then add the following to `rygen.toml`:
+To add a post, simply write Markdown in `posts/foo.md`, then add the following to `sausage.toml`:
 
 ```toml
 [post.foo]
@@ -41,7 +41,7 @@ CSS styles and other static content can be found in `static/`. The color scheme 
 ## Future plans
 
 - Code highlighting with [tree-sitter](https://github.com/tree-sitter/tree-sitter)
-- Arbitrary data specified in `rygen.toml` and queryable in templates
+- Arbitrary data specified in `sausage.toml` and queryable in templates
 - Write `publish` script that manages publish date and creates/updates pages
 - Better JS & WASM support
 

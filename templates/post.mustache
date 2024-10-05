@@ -4,12 +4,15 @@
 <article>
   <header>
     <h1>{{title}}</h1>
+    <div class="line-break"></div>
     <span>
     {{#tags}}
     <a href="/tag/{{id}}.html">#{{id}}</a>
     {{/tags}}
     </span>
     <time>{{date}}</time>
+    <div class="line-break"></div>
+    <span class="desc"><small>{{desc}}&nbsp;</small></span>
     <hr />
   </header>
   {{& content}}

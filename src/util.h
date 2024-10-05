@@ -19,6 +19,8 @@
   fprintf(stderr, ": %s\n", strerror(errno));                                                      \
   exit(EXIT_FAILURE);
 
+#define arrlen(a) (size_t)(sizeof(a) / sizeof(*(a)))
+
 typedef struct {
   char *data;
   size_t length;
